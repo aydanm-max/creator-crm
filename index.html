@@ -576,6 +576,8 @@
 
 <!-- HEADER -->
 <header class="header">
+<div id="loadingBar" style="display:none;position:fixed;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#c17f3b,#f5e8d6,#c17f3b);background-size:200%;animation:shimmer 1.5s infinite;z-index:9999;"></div>
+<style>@keyframes shimmer{0%{background-position:200%}100%{background-position:-200%}}</style>
   <div class="header-brand">
     <h1>Brand CRM</h1>
     <span class="header-sub">@thesearethedaysillmiss</span>
@@ -787,10 +789,15 @@
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-// ── DATA ──────────────────────────────────────────────────────────────────────
+// ── SUPABASE CONFIG ───────────────────────────────────────────────────────────
+const SUPABASE_URL = 'https://hwpaycmptnghcopgxpaj.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_RCobGlNpHCsxQsFtLlWSXg_t6QS83pv';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const TABLE = 'deals';
 
-const STORAGE_KEY = 'creator_crm_v1';
+// ── DATA ──────────────────────────────────────────────────────────────────────
 let deals = [];
 let editingId = null;
 let viewingId = null;
@@ -798,16 +805,94 @@ let currentView = 'all';
 let sortKey = 'brand';
 let sortDir = 1;
 
-function loadData() {
+async function loadData() {
+  showLoading(true);
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) deals = JSON.parse(raw);
-    else deals = getSampleData();
-  } catch(e) { deals = getSampleData(); }
+    const { data, error } = await sb.from(TABLE).select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    deals = (data || []).map(dbToLocal);
+  } catch(e) {
+    console.error('Load error:', e);
+    deals = [];
+  }
+  showLoading(false);
+  renderDashboard();
+  renderTable();
 }
 
-function saveData() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(deals));
+async function saveData(deal, isNew) {
+  const row = localToDb(deal);
+  if (isNew) {
+    const { error } = await sb.from(TABLE).insert([row]);
+    if (error) { alert('Save failed: ' + error.message); return false; }
+  } else {
+    const { error } = await sb.from(TABLE).update(row).eq('id', deal.id);
+    if (error) { alert('Save failed: ' + error.message); return false; }
+  }
+  return true;
+}
+
+async function deleteData(id) {
+  const { error } = await sb.from(TABLE).delete().eq('id', id);
+  if (error) { alert('Delete failed: ' + error.message); return false; }
+  return true;
+}
+
+// Map local camelCase → DB snake_case
+function localToDb(d) {
+  return {
+    id: d.id,
+    brand: d.brand,
+    contact: d.contact,
+    email: d.email,
+    status: d.status,
+    type: d.type,
+    platform: d.platform,
+    deliverables: d.deliverables,
+    first_contact: d.firstContact || null,
+    latest_reply: d.latestReply || null,
+    follow_up_date: d.followUpDate || null,
+    due_date: d.dueDate || null,
+    posted_date: d.postedDate || null,
+    invoice_date: d.invoiceDate || null,
+    payment_due: d.paymentDue || null,
+    payment_received: d.paymentReceived || null,
+    amount_quoted: d.amountQuoted ? parseFloat(d.amountQuoted) : null,
+    amount_agreed: d.amountAgreed ? parseFloat(d.amountAgreed) : null,
+    reliability: d.reliability,
+    notes: d.notes,
+  };
+}
+
+// Map DB snake_case → local camelCase
+function dbToLocal(r) {
+  return {
+    id: r.id,
+    brand: r.brand || '',
+    contact: r.contact || '',
+    email: r.email || '',
+    status: r.status || 'new',
+    type: r.type || 'paid',
+    platform: r.platform || 'instagram',
+    deliverables: r.deliverables || '',
+    firstContact: r.first_contact || '',
+    latestReply: r.latest_reply || '',
+    followUpDate: r.follow_up_date || '',
+    dueDate: r.due_date || '',
+    postedDate: r.posted_date || '',
+    invoiceDate: r.invoice_date || '',
+    paymentDue: r.payment_due || '',
+    paymentReceived: r.payment_received || '',
+    amountQuoted: r.amount_quoted != null ? String(r.amount_quoted) : '',
+    amountAgreed: r.amount_agreed != null ? String(r.amount_agreed) : '',
+    reliability: r.reliability || '',
+    notes: r.notes || '',
+  };
+}
+
+function showLoading(on) {
+  const el = document.getElementById('loadingBar');
+  if (el) el.style.display = on ? 'block' : 'none';
 }
 
 function getSampleData() {
@@ -1134,7 +1219,7 @@ function openEdit(id) {
   openModal('addModal');
 }
 
-function saveDeal() {
+async function saveDeal() {
   const brand = document.getElementById('f_brand').value.trim();
   if (!brand) { alert('Brand name is required.'); return; }
 
@@ -1161,14 +1246,17 @@ function saveDeal() {
     notes: document.getElementById('f_notes').value.trim(),
   };
 
-  if (editingId) {
+  const isNew = !editingId;
+  const ok = await saveData(deal, isNew);
+  if (!ok) return;
+
+  if (!isNew) {
     const idx = deals.findIndex(x => x.id === editingId);
     if (idx !== -1) deals[idx] = deal;
   } else {
     deals.unshift(deal);
   }
 
-  saveData();
   closeModal('addModal');
   renderDashboard();
   renderTable();
@@ -1234,12 +1322,13 @@ function editFromDetail() {
   openEdit(viewingId);
 }
 
-function deleteDealFromDetail() {
+async function deleteDealFromDetail() {
   const d = deals.find(x => x.id === viewingId);
   if (!d) return;
   if (!confirm(`Delete "${d.brand}"? This cannot be undone.`)) return;
+  const ok = await deleteData(viewingId);
+  if (!ok) return;
   deals = deals.filter(x => x.id !== viewingId);
-  saveData();
   closeModal('detailModal');
   renderDashboard();
   renderTable();
@@ -1278,8 +1367,7 @@ function exportCSV() {
 // ── INIT ──────────────────────────────────────────────────────────────────────
 
 loadData();
-renderDashboard();
-renderTable();
+
 </script>
 </body>
 </html>
