@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Creator CRM</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #faf8f4;
+    --warm-white: #ffffff;
+    --ink: #1a1714;
+    --ink-light: #4a4540;
+    --ink-muted: #9a9390;
+    --accent: #c17f3b;
+    --accent-light: #f5e8d6;
+    --accent-pale: #fdf5ec;
+    --green: #3b7a57;
+    --green-light: #d6ede2;
+    --red: #b84040;
+    --red-light: #f0d6d6;
+    --blue: #3b5f8a;
+    --blue-light: #d6e3f0;
+    --yellow: #b89b3b;
+    --yellow-light: #f0e9d6;
+    --purple: #6b4f8a;
+    --purple-light: #e3d6f0;
+    --border: #e8e2d9;
+    --shadow: 0 1px 3px rgba(26,23,20,0.06), 0 4px 16px rgba(26,23,20,0.04);
+    --shadow-md: 0 2px 8px rgba(26,23,20,0.08), 0 8px 32px rgba(26,23,20,0.06);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--ink);
+    color: white;
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-brand {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    letter-spacing: -0.3px;
+    color: white;
+  }
+  .header-sub {
+    font-size: 11px;
+    color: rgba(255,255,255,0.45);
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .header-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  /* BUTTONS */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif;
+    white-space: nowrap;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: white;
+  }
+  .btn-primary:hover { background: #a86e2e; }
+  .btn-ghost {
+    background: transparent;
+    color: rgba(255,255,255,0.7);
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+  .btn-ghost:hover { background: rgba(255,255,255,0.08); color: white; }
+  .btn-outline {
+    background: white;
+    color: var(--ink);
+    border: 1px solid var(--border);
+  }
+  .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-sm { padding: 5px 11px; font-size: 12px; }
+  .btn-danger { background: var(--red); color: white; }
+  .btn-danger:hover { background: #9e3535; }
+
+  /* LAYOUT */
+  .container { max-width: 1400px; margin: 0 auto; padding: 0 24px; }
+
+  /* DASHBOARD */
+  .dashboard {
+    background: white;
+    border-bottom: 1px solid var(--border);
+    padding: 24px 0;
+  }
+  .dashboard-inner {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 16px;
+  }
+  .stat-card {
+    background: var(--cream);
+    border-radius: 10px;
+    padding: 16px;
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card.alert { background: var(--red-light); border-color: #e8c5c5; }
+  .stat-card.money { background: var(--green-light); border-color: #bddecf; }
+  .stat-card.accent { background: var(--accent-pale); border-color: #e8d4b8; }
+  .stat-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin-bottom: 6px;
+  }
+  .stat-value {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .stat-card.alert .stat-value { color: var(--red); }
+  .stat-card.money .stat-value { color: var(--green); }
+  .stat-card.accent .stat-value { color: var(--accent); }
+  .stat-sub {
+    font-size: 11px;
+    color: var(--ink-muted);
+    margin-top: 4px;
+  }
+
+  /* TOOLBAR */
+  .toolbar {
+    padding: 16px 0;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .toolbar-left { display: flex; gap: 10px; align-items: center; flex: 1; }
+  .toolbar-right { display: flex; gap: 8px; }
+
+  .search-box {
+    position: relative;
+    flex: 1;
+    max-width: 280px;
+  }
+  .search-box input {
+    width: 100%;
+    padding: 8px 12px 8px 34px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    background: white;
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .search-box input:focus { border-color: var(--accent); }
+  .search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--ink-muted);
+    font-size: 14px;
+  }
+
+  .filter-select {
+    padding: 7px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    background: white;
+    color: var(--ink);
+    outline: none;
+    cursor: pointer;
+  }
+  .filter-select:focus { border-color: var(--accent); }
+
+  /* QUICK VIEWS */
+  .quick-tabs {
+    display: flex;
+    gap: 4px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 4px;
+  }
+  .quick-tab {
+    padding: 5px 12px;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    color: var(--ink-muted);
+    transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .quick-tab.active {
+    background: var(--ink);
+    color: white;
+  }
+  .quick-tab:hover:not(.active) { color: var(--ink); }
+
+  /* TABLE */
+  .table-wrap {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    margin-bottom: 24px;
+  }
+  .table-scroll { overflow-x: auto; }
+
+  table { width: 100%; border-collapse: collapse; min-width: 1100px; }
+  thead { background: var(--cream); border-bottom: 2px solid var(--border); }
+  th {
+    padding: 11px 14px;
+    text-align: left;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+  }
+  th:hover { color: var(--ink); }
+  th.sort-asc::after { content: ' ↑'; color: var(--accent); }
+  th.sort-desc::after { content: ' ↓'; color: var(--accent); }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s;
+  }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--accent-pale); cursor: pointer; }
+  tbody tr.overdue-row { background: #fff8f8; }
+  tbody tr.followup-row { background: #fffbf4; }
+
+  td {
+    padding: 12px 14px;
+    font-size: 13px;
+    color: var(--ink);
+    vertical-align: middle;
+  }
+
+  .brand-name {
+    font-weight: 600;
+    font-size: 13.5px;
+  }
+  .contact-name { color: var(--ink-light); font-size: 12px; }
+  .email-link {
+    color: var(--accent);
+    font-size: 11px;
+    text-decoration: none;
+  }
+  .email-link:hover { text-decoration: underline; }
+
+  /* BADGES */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+    letter-spacing: 0.02em;
+  }
+  .badge-new { background: #e8e2d9; color: #4a4540; }
+  .badge-pitched { background: var(--blue-light); color: var(--blue); }
+  .badge-replied { background: var(--purple-light); color: var(--purple); }
+  .badge-negotiating { background: var(--yellow-light); color: #7a6420; }
+  .badge-confirmed { background: var(--accent-light); color: #7a4a1a; }
+  .badge-content-due { background: #ffe8cc; color: #8a4a00; }
+  .badge-posted { background: var(--green-light); color: #2a5a3a; }
+  .badge-invoice-sent { background: var(--blue-light); color: var(--blue); }
+  .badge-paid { background: var(--green-light); color: var(--green); }
+  .badge-closed { background: var(--red-light); color: var(--red); }
+
+  .badge-paid-deal { background: #d6ede2; color: #2a5a3a; }
+  .badge-gifted { background: var(--purple-light); color: var(--purple); }
+  .badge-affiliate { background: var(--blue-light); color: var(--blue); }
+  .badge-ugc { background: var(--yellow-light); color: #7a6420; }
+
+  .platform-badge {
+    font-size: 11px;
+    color: var(--ink-muted);
+    font-weight: 500;
+  }
+
+  .amount {
+    font-weight: 600;
+    color: var(--green);
+    font-size: 13px;
+  }
+  .amount-quoted { color: var(--ink-muted); font-weight: 500; }
+
+  .date-cell { font-size: 12px; color: var(--ink-muted); white-space: nowrap; }
+  .date-overdue { color: var(--red); font-weight: 600; }
+  .date-soon { color: var(--yellow); font-weight: 600; }
+
+  .reliability-dot {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+  }
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .dot-green { background: var(--green); }
+  .dot-red { background: var(--red); }
+  .dot-gray { background: var(--ink-muted); }
+
+  .row-actions {
+    display: flex;
+    gap: 6px;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  tbody tr:hover .row-actions { opacity: 1; }
+
+  .notes-preview {
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 12px;
+    color: var(--ink-muted);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 24px;
+    color: var(--ink-muted);
+  }
+  .empty-state-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    margin-bottom: 8px;
+    color: var(--ink-light);
+  }
+  .empty-state-sub { font-size: 13px; }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(26,23,20,0.55);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: white;
+    border-radius: 14px;
+    box-shadow: var(--shadow-md);
+    width: 100%;
+    max-width: 720px;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: slideUp 0.2s ease;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(16px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  .modal-header {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 10;
+  }
+  .modal-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+  }
+  .modal-close {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: var(--ink-muted);
+    line-height: 1;
+    padding: 4px;
+  }
+  .modal-close:hover { color: var(--ink); }
+
+  .modal-body { padding: 20px 24px 24px; }
+
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  .form-group.full { grid-column: 1 / -1; }
+
+  label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="date"],
+  input[type="number"],
+  select,
+  textarea {
+    padding: 9px 12px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.15s, background 0.15s;
+    width: 100%;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--accent);
+    background: white;
+  }
+  textarea { resize: vertical; min-height: 70px; }
+  select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%239a9390' d='M6 8L0 0h12z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 30px; }
+
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 15px;
+    margin: 20px 0 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    color: var(--ink-light);
+  }
+
+  .modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    background: var(--cream);
+    border-radius: 0 0 14px 14px;
+  }
+
+  /* DETAIL MODAL */
+  .detail-section { margin-bottom: 20px; }
+  .detail-section h3 {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .detail-item {}
+  .detail-label { font-size: 11px; color: var(--ink-muted); margin-bottom: 2px; }
+  .detail-value { font-size: 13.5px; font-weight: 500; }
+
+  /* ALERT BANNER */
+  .alert-banner {
+    background: var(--red-light);
+    border: 1px solid #e8c5c5;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 12px;
+    color: var(--red);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .followup-banner {
+    background: var(--yellow-light);
+    border: 1px solid #e8d4b8;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 12px;
+    color: #7a6420;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--ink-muted); }
+
+  .count-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--accent);
+    color: white;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 6px;
+    min-width: 18px;
+    margin-left: 4px;
+  }
+
+  @media (max-width: 900px) {
+    .dashboard-inner { grid-template-columns: repeat(3, 1fr); }
+    .form-grid { grid-template-columns: 1fr; }
+    .form-grid.three { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 600px) {
+    .dashboard-inner { grid-template-columns: repeat(2, 1fr); }
+    .header h1 { font-size: 18px; }
+    .container { padding: 0 14px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-brand">
+    <h1>Brand CRM</h1>
+    <span class="header-sub">@thesearethedaysillmiss</span>
+  </div>
+  <div class="header-actions">
+    <button class="btn btn-ghost btn-sm" onclick="exportCSV()">↓ Export CSV</button>
+    <button class="btn btn-primary" onclick="openAddModal()">+ Add Brand</button>
+  </div>
+</header>
+
+<!-- DASHBOARD -->
+<div class="dashboard">
+  <div class="container">
+    <div class="dashboard-inner" id="dashboardStats"></div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="container">
+  <div class="toolbar">
+    <div class="toolbar-left">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="Search brands, contacts…" oninput="renderTable()">
+      </div>
+      <div class="quick-tabs" id="quickTabs">
+        <button class="quick-tab active" data-view="all" onclick="setView('all', this)">All</button>
+        <button class="quick-tab" data-view="active" onclick="setView('active', this)">Active</button>
+        <button class="quick-tab" data-view="followup" onclick="setView('followup', this)">Follow Up</button>
+        <button class="quick-tab" data-view="unpaid" onclick="setView('unpaid', this)">Unpaid 💰</button>
+        <button class="quick-tab" data-view="content" onclick="setView('content', this)">Content Due</button>
+      </div>
+    </div>
+    <div class="toolbar-right">
+      <select class="filter-select" id="statusFilter" onchange="renderTable()">
+        <option value="">All Statuses</option>
+        <option>new</option><option>pitched</option><option>replied</option>
+        <option>negotiating</option><option>confirmed</option><option>content due</option>
+        <option>posted</option><option>invoice sent</option><option>paid</option><option>closed / no</option>
+      </select>
+      <select class="filter-select" id="typeFilter" onchange="renderTable()">
+        <option value="">All Types</option>
+        <option>paid</option><option>gifted</option><option>affiliate</option><option>ugc</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-wrap">
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th onclick="sortBy('brand')">Brand</th>
+            <th onclick="sortBy('status')">Status</th>
+            <th onclick="sortBy('type')">Type</th>
+            <th onclick="sortBy('platform')">Platform</th>
+            <th onclick="sortBy('amountAgreed')">Deal $</th>
+            <th onclick="sortBy('followUpDate')">Follow Up</th>
+            <th onclick="sortBy('dueDate')">Due Date</th>
+            <th onclick="sortBy('paymentDueDate')">Pmt Due</th>
+            <th onclick="sortBy('reliability')">Reliability</th>
+            <th>Notes</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ADD/EDIT MODAL -->
+<div class="modal-overlay" id="addModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title" id="modalTitle">Add Brand Deal</h2>
+      <button class="modal-close" onclick="closeModal('addModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="section-title">Brand Info</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Brand Name *</label>
+          <input type="text" id="f_brand" placeholder="e.g. SIJO Bedding">
+        </div>
+        <div class="form-group">
+          <label>Contact Person</label>
+          <input type="text" id="f_contact" placeholder="e.g. Sarah K.">
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="f_email" placeholder="sarah@brand.com">
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select id="f_status">
+            <option>new</option><option>pitched</option><option>replied</option>
+            <option>negotiating</option><option>confirmed</option><option>content due</option>
+            <option>posted</option><option>invoice sent</option><option>paid</option><option>closed / no</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Deal Type</label>
+          <select id="f_type">
+            <option>paid</option><option>gifted</option><option>affiliate</option><option>ugc</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Platform</label>
+          <select id="f_platform">
+            <option>instagram</option><option>tiktok</option><option>both</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="section-title">Dates</div>
+      <div class="form-grid three">
+        <div class="form-group">
+          <label>Date First Contacted</label>
+          <input type="date" id="f_firstContact">
+        </div>
+        <div class="form-group">
+          <label>Latest Reply</label>
+          <input type="date" id="f_latestReply">
+        </div>
+        <div class="form-group">
+          <label>Follow-Up Date</label>
+          <input type="date" id="f_followUp">
+        </div>
+        <div class="form-group">
+          <label>Content Due Date</label>
+          <input type="date" id="f_dueDate">
+        </div>
+        <div class="form-group">
+          <label>Posted Date</label>
+          <input type="date" id="f_postedDate">
+        </div>
+        <div class="form-group">
+          <label>Invoice Sent Date</label>
+          <input type="date" id="f_invoiceDate">
+        </div>
+        <div class="form-group">
+          <label>Payment Due Date</label>
+          <input type="date" id="f_paymentDue">
+        </div>
+        <div class="form-group">
+          <label>Payment Received</label>
+          <input type="date" id="f_paymentReceived">
+        </div>
+      </div>
+
+      <div class="section-title">Financials & Deliverables</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Amount Quoted ($)</label>
+          <input type="number" id="f_amountQuoted" placeholder="350">
+        </div>
+        <div class="form-group">
+          <label>Amount Agreed ($)</label>
+          <input type="number" id="f_amountAgreed" placeholder="350">
+        </div>
+        <div class="form-group full">
+          <label>Deliverables Promised</label>
+          <input type="text" id="f_deliverables" placeholder="e.g. 1 Reel + 3 Stories + TikTok">
+        </div>
+      </div>
+
+      <div class="section-title">Notes & Reliability</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Reliability / Experience</label>
+          <select id="f_reliability">
+            <option value="">— Not rated yet —</option>
+            <option value="easy">✅ Easy to work with</option>
+            <option value="late">⚠️ Pays late</option>
+            <option value="difficult">❌ Difficult</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label>Notes</label>
+          <textarea id="f_notes" placeholder="Any context, email threads, special requirements…"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('addModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveDeal()">Save Deal</button>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-overlay" id="detailModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <h2 class="modal-title" id="detail_brand"></h2>
+        <div style="font-size:12px;color:var(--ink-muted);margin-top:2px" id="detail_contact"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal('detailModal')">✕</button>
+    </div>
+    <div class="modal-body" id="detailBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-danger btn-sm" onclick="deleteDealFromDetail()">Delete</button>
+      <button class="btn btn-outline" onclick="closeModal('detailModal')">Close</button>
+      <button class="btn btn-primary" onclick="editFromDetail()">Edit Deal</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────────
+
+const STORAGE_KEY = 'creator_crm_v1';
+let deals = [];
+let editingId = null;
+let viewingId = null;
+let currentView = 'all';
+let sortKey = 'brand';
+let sortDir = 1;
+
+function loadData() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) deals = JSON.parse(raw);
+    else deals = getSampleData();
+  } catch(e) { deals = getSampleData(); }
+}
+
+function saveData() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(deals));
+}
+
+function getSampleData() {
+  const today = new Date();
+  const fmt = d => d.toISOString().slice(0,10);
+  const add = (d, n) => { let x = new Date(d); x.setDate(x.getDate()+n); return x; };
+  return [
+    {
+      id: uid(), brand: 'Function Health', contact: 'Brand Team', email: 'partnerships@functionhealth.com',
+      status: 'confirmed', type: 'gifted', platform: 'instagram',
+      firstContact: fmt(add(today,-30)), latestReply: fmt(add(today,-3)), followUpDate: fmt(add(today,0)),
+      dueDate: fmt(add(today,5)), postedDate: '', invoiceDate: '', paymentDue: '', paymentReceived: '',
+      amountQuoted: '', amountAgreed: '', deliverables: '8-slide carousel',
+      reliability: 'easy', notes: 'Carousel in progress. Follow up on paid pitch sent Mar 12.'
+    },
+    {
+      id: uid(), brand: 'SIJO Bedding', contact: 'Partnerships', email: 'collab@sijo.com',
+      status: 'content due', type: 'paid', platform: 'instagram',
+      firstContact: fmt(add(today,-45)), latestReply: fmt(add(today,-7)), followUpDate: '',
+      dueDate: fmt(add(today,2)), postedDate: '', invoiceDate: '', paymentDue: '', paymentReceived: '',
+      amountQuoted: '350', amountAgreed: '350', deliverables: '1 Reel',
+      reliability: 'easy', notes: 'March campaign confirmed. Content due soon!'
+    },
+    {
+      id: uid(), brand: 'Banana Republic', contact: 'Influencer Team', email: 'br@gapinc.com',
+      status: 'posted', type: 'gifted', platform: 'instagram',
+      firstContact: fmt(add(today,-60)), latestReply: fmt(add(today,-5)), followUpDate: '',
+      dueDate: fmt(add(today,-10)), postedDate: fmt(add(today,-3)), invoiceDate: '', paymentDue: '', paymentReceived: '',
+      amountQuoted: '', amountAgreed: '', deliverables: '1 Reel + Stories',
+      reliability: 'easy', notes: 'Gifted partnership. Shipped.'
+    },
+    {
+      id: uid(), brand: 'Motherferment', contact: 'Affiliate Team', email: 'affiliate@motherferment.com',
+      status: 'paid', type: 'affiliate', platform: 'both',
+      firstContact: fmt(add(today,-90)), latestReply: fmt(add(today,-14)), followUpDate: '',
+      dueDate: '', postedDate: fmt(add(today,-30)), invoiceDate: '', paymentDue: '', paymentReceived: fmt(add(today,-5)),
+      amountQuoted: '', amountAgreed: '', deliverables: 'Ongoing affiliate posts. Code AYDAN, 10% commission.',
+      reliability: 'easy', notes: 'Link: motherferment.com/aydan. Ongoing commission.'
+    },
+    {
+      id: uid(), brand: 'Gap', contact: 'Influencer Mgmt', email: 'gap@gapinc.com',
+      status: 'replied', type: 'gifted', platform: 'instagram',
+      firstContact: fmt(add(today,-20)), latestReply: fmt(add(today,-8)), followUpDate: fmt(add(today,0)),
+      dueDate: '', postedDate: '', invoiceDate: '', paymentDue: '', paymentReceived: '',
+      amountQuoted: '', amountAgreed: '', deliverables: 'TBD — gifted items shipped',
+      reliability: '', notes: 'Items shipped. Awaiting creative brief.'
+    },
+    {
+      id: uid(), brand: 'Plant Therapy', contact: 'Courtney Chadderdon', email: 'courtney@planttherapy.com',
+      status: 'negotiating', type: 'paid', platform: 'instagram',
+      firstContact: fmt(add(today,-15)), latestReply: fmt(add(today,-10)), followUpDate: fmt(add(today,-1)),
+      dueDate: '', postedDate: '', invoiceDate: '', paymentDue: '', paymentReceived: '',
+      amountQuoted: '250', amountAgreed: '', deliverables: 'Voiceover opportunity pending',
+      reliability: '', notes: 'Voiceover opp. Follow up with Courtney.'
+    },
+    {
+      id: uid(), brand: 'Spindrift', contact: '', email: '',
+      status: 'pitched', type: 'paid', platform: 'instagram',
+      firstContact: fmt(add(today,-5)), latestReply: '', followUpDate: fmt(add(today,7)),
+      dueDate: '', postedDate: '', invoiceDate: '', paymentDue: '', paymentReceived: '',
+      amountQuoted: '350', amountAgreed: '', deliverables: '1 Reel',
+      reliability: '', notes: 'Cold outreach sent. Awaiting reply.'
+    },
+    {
+      id: uid(), brand: 'OLIPOP', contact: '', email: '',
+      status: 'new', type: 'paid', platform: 'both',
+      firstContact: '', latestReply: '', followUpDate: fmt(add(today,3)),
+      dueDate: '', postedDate: '', invoiceDate: '', paymentDue: '', paymentReceived: '',
+      amountQuoted: '650', amountAgreed: '', deliverables: '1 Reel + TikTok',
+      reliability: '', notes: 'Pending outreach. Bundle rate.'
+    }
+  ];
+}
+
+function uid() {
+  return Math.random().toString(36).slice(2,10) + Date.now().toString(36);
+}
+
+// ── DATE HELPERS ─────────────────────────────────────────────────────────────
+
+function today() {
+  return new Date().toISOString().slice(0,10);
+}
+
+function daysFromToday(dateStr) {
+  if (!dateStr) return null;
+  const d = new Date(dateStr);
+  const t = new Date(); t.setHours(0,0,0,0);
+  return Math.round((d - t) / 86400000);
+}
+
+function fmtDate(dateStr) {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'2-digit' });
+}
+
+function dateClass(dateStr) {
+  const n = daysFromToday(dateStr);
+  if (n === null) return '';
+  if (n < 0) return 'date-overdue';
+  if (n <= 3) return 'date-soon';
+  return '';
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────────────────────
+
+function renderDashboard() {
+  const t = today();
+  const active = deals.filter(d => !['paid','closed / no'].includes(d.status));
+  const unpaid = deals.filter(d => d.status === 'invoice sent' || (d.status !== 'paid' && d.amountAgreed && parseFloat(d.amountAgreed) > 0 && ['posted','content due','confirmed'].includes(d.status)));
+  const pendingMoney = unpaid.reduce((s,d) => s + (parseFloat(d.amountAgreed)||0), 0);
+  const followToday = deals.filter(d => d.followUpDate === t);
+  const endOfWeek = new Date(); endOfWeek.setDate(endOfWeek.getDate()+7);
+  const contentThisWeek = deals.filter(d => d.dueDate && new Date(d.dueDate) <= endOfWeek && new Date(d.dueDate) >= new Date(t) && d.status !== 'posted' && d.status !== 'paid');
+  const paidBrands = [...new Set(deals.filter(d => d.reliability === 'easy' && d.status === 'paid').map(d => d.brand))];
+
+  document.getElementById('dashboardStats').innerHTML = `
+    <div class="stat-card">
+      <div class="stat-label">Active Deals</div>
+      <div class="stat-value">${active.length}</div>
+      <div class="stat-sub">in progress</div>
+    </div>
+    <div class="stat-card ${unpaid.length ? 'alert' : ''}">
+      <div class="stat-label">Unpaid Deals</div>
+      <div class="stat-value">${unpaid.length}</div>
+      <div class="stat-sub">awaiting payment</div>
+    </div>
+    <div class="stat-card money">
+      <div class="stat-label">Money Pending</div>
+      <div class="stat-value">$${pendingMoney.toLocaleString()}</div>
+      <div class="stat-sub">total owed to you</div>
+    </div>
+    <div class="stat-card ${followToday.length ? 'accent' : ''}">
+      <div class="stat-label">Follow-Ups Today</div>
+      <div class="stat-value">${followToday.length}</div>
+      <div class="stat-sub">${followToday.length ? followToday.map(d=>d.brand).join(', ') : 'all clear'}</div>
+    </div>
+    <div class="stat-card ${contentThisWeek.length ? 'accent' : ''}">
+      <div class="stat-label">Content Due</div>
+      <div class="stat-value">${contentThisWeek.length}</div>
+      <div class="stat-sub">this week</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Trusted Brands</div>
+      <div class="stat-value">${paidBrands.length}</div>
+      <div class="stat-sub">${paidBrands.slice(0,2).join(', ')}${paidBrands.length > 2 ? '…' : ''}</div>
+    </div>
+  `;
+}
+
+// ── TABLE ─────────────────────────────────────────────────────────────────────
+
+const ACTIVE_STATUSES = ['new','pitched','replied','negotiating','confirmed','content due','posted','invoice sent'];
+const UNPAID_STATUSES = ['invoice sent'];
+
+function getFilteredDeals() {
+  let data = [...deals];
+  const q = document.getElementById('searchInput')?.value.toLowerCase() || '';
+  const sf = document.getElementById('statusFilter')?.value || '';
+  const tf = document.getElementById('typeFilter')?.value || '';
+  const t = today();
+  const endOfWeek = new Date(); endOfWeek.setDate(endOfWeek.getDate()+7);
+
+  if (currentView === 'active') data = data.filter(d => ACTIVE_STATUSES.includes(d.status));
+  if (currentView === 'followup') data = data.filter(d => d.followUpDate && d.followUpDate <= t);
+  if (currentView === 'unpaid') data = data.filter(d =>
+    d.status === 'invoice sent' || (d.amountAgreed && parseFloat(d.amountAgreed) > 0 && ['posted','content due','confirmed'].includes(d.status))
+  );
+  if (currentView === 'content') data = data.filter(d =>
+    d.dueDate && new Date(d.dueDate) <= endOfWeek && new Date(d.dueDate) >= new Date(t) && !['posted','paid'].includes(d.status)
+  );
+
+  if (q) data = data.filter(d =>
+    d.brand.toLowerCase().includes(q) ||
+    (d.contact||'').toLowerCase().includes(q) ||
+    (d.email||'').toLowerCase().includes(q) ||
+    (d.notes||'').toLowerCase().includes(q)
+  );
+  if (sf) data = data.filter(d => d.status === sf);
+  if (tf) data = data.filter(d => d.type === tf);
+
+  data.sort((a,b) => {
+    let va = a[sortKey]||'', vb = b[sortKey]||'';
+    if (sortKey === 'amountAgreed') { va = parseFloat(va)||0; vb = parseFloat(vb)||0; }
+    if (va < vb) return -sortDir;
+    if (va > vb) return sortDir;
+    return 0;
+  });
+  return data;
+}
+
+function statusBadge(s) {
+  const cls = {
+    'new':'badge-new','pitched':'badge-pitched','replied':'badge-replied',
+    'negotiating':'badge-negotiating','confirmed':'badge-confirmed','content due':'badge-content-due',
+    'posted':'badge-posted','invoice sent':'badge-invoice-sent','paid':'badge-paid','closed / no':'badge-closed'
+  };
+  return `<span class="badge ${cls[s]||'badge-new'}">${s}</span>`;
+}
+
+function typeBadge(t) {
+  const cls = { 'paid':'badge-paid-deal','gifted':'badge-gifted','affiliate':'badge-affiliate','ugc':'badge-ugc' };
+  return `<span class="badge ${cls[t]||''}">${t}</span>`;
+}
+
+function reliabilityDot(r) {
+  if (!r) return `<span class="reliability-dot"><span class="dot dot-gray"></span>—</span>`;
+  if (r==='easy') return `<span class="reliability-dot"><span class="dot dot-green"></span>easy</span>`;
+  if (r==='late') return `<span class="reliability-dot"><span class="dot dot-red"></span>late payer</span>`;
+  return `<span class="reliability-dot"><span class="dot dot-red"></span>difficult</span>`;
+}
+
+function renderTable() {
+  const data = getFilteredDeals();
+  const t = today();
+  const tbody = document.getElementById('tableBody');
+
+  if (!data.length) {
+    tbody.innerHTML = `<tr><td colspan="11">
+      <div class="empty-state">
+        <div class="empty-state-title">No deals found</div>
+        <div class="empty-state-sub">Try adjusting your filters, or add a new brand deal.</div>
+      </div>
+    </td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = data.map(d => {
+    const isOverdue = d.dueDate && d.dueDate < t && !['posted','paid'].includes(d.status);
+    const isFollowup = d.followUpDate && d.followUpDate <= t && !['paid','closed / no'].includes(d.status);
+    const rowClass = isOverdue ? 'overdue-row' : (isFollowup ? 'followup-row' : '');
+    const amount = d.amountAgreed ? `<span class="amount">$${parseFloat(d.amountAgreed).toLocaleString()}</span>` :
+      (d.amountQuoted ? `<span class="amount-quoted">$${parseFloat(d.amountQuoted).toLocaleString()} quoted</span>` : '—');
+
+    return `<tr class="${rowClass}" onclick="openDetail('${d.id}')">
+      <td>
+        <div class="brand-name">${d.brand}</div>
+        ${d.contact ? `<div class="contact-name">${d.contact}</div>` : ''}
+        ${d.email ? `<a class="email-link" href="mailto:${d.email}" onclick="event.stopPropagation()">${d.email}</a>` : ''}
+      </td>
+      <td>${statusBadge(d.status)}</td>
+      <td>${typeBadge(d.type)}</td>
+      <td><span class="platform-badge">${d.platform||'—'}</span></td>
+      <td>${amount}</td>
+      <td class="date-cell ${isFollowup ? 'date-overdue' : ''}">${fmtDate(d.followUpDate)}</td>
+      <td class="date-cell ${isOverdue ? 'date-overdue' : dateClass(d.dueDate)}">${fmtDate(d.dueDate)}</td>
+      <td class="date-cell ${dateClass(d.paymentDue)}">${fmtDate(d.paymentDue)}</td>
+      <td>${reliabilityDot(d.reliability)}</td>
+      <td><div class="notes-preview">${d.notes||'—'}</div></td>
+      <td>
+        <div class="row-actions" onclick="event.stopPropagation()">
+          <button class="btn btn-outline btn-sm" onclick="openEdit('${d.id}')">Edit</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ── SORT ──────────────────────────────────────────────────────────────────────
+
+function sortBy(key) {
+  if (sortKey === key) sortDir *= -1;
+  else { sortKey = key; sortDir = 1; }
+  document.querySelectorAll('th').forEach(th => {
+    th.classList.remove('sort-asc','sort-desc');
+    if (th.getAttribute('onclick') === `sortBy('${key}')`) {
+      th.classList.add(sortDir === 1 ? 'sort-asc' : 'sort-desc');
+    }
+  });
+  renderTable();
+}
+
+// ── VIEW ──────────────────────────────────────────────────────────────────────
+
+function setView(view, el) {
+  currentView = view;
+  document.querySelectorAll('.quick-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderTable();
+}
+
+// ── MODAL ─────────────────────────────────────────────────────────────────────
+
+function openAddModal() {
+  editingId = null;
+  document.getElementById('modalTitle').textContent = 'Add Brand Deal';
+  ['brand','contact','email','deliverables','notes'].forEach(f => document.getElementById('f_'+f).value = '');
+  ['firstContact','latestReply','followUp','dueDate','postedDate','invoiceDate','paymentDue','paymentReceived','amountQuoted','amountAgreed'].forEach(f => document.getElementById('f_'+f).value = '');
+  document.getElementById('f_status').value = 'new';
+  document.getElementById('f_type').value = 'paid';
+  document.getElementById('f_platform').value = 'instagram';
+  document.getElementById('f_reliability').value = '';
+  // Set today as default contact date
+  document.getElementById('f_firstContact').value = today();
+  openModal('addModal');
+}
+
+function openEdit(id) {
+  const d = deals.find(x => x.id === id);
+  if (!d) return;
+  editingId = id;
+  document.getElementById('modalTitle').textContent = 'Edit — ' + d.brand;
+  document.getElementById('f_brand').value = d.brand||'';
+  document.getElementById('f_contact').value = d.contact||'';
+  document.getElementById('f_email').value = d.email||'';
+  document.getElementById('f_status').value = d.status||'new';
+  document.getElementById('f_type').value = d.type||'paid';
+  document.getElementById('f_platform').value = d.platform||'instagram';
+  document.getElementById('f_firstContact').value = d.firstContact||'';
+  document.getElementById('f_latestReply').value = d.latestReply||'';
+  document.getElementById('f_followUp').value = d.followUpDate||'';
+  document.getElementById('f_dueDate').value = d.dueDate||'';
+  document.getElementById('f_postedDate').value = d.postedDate||'';
+  document.getElementById('f_invoiceDate').value = d.invoiceDate||'';
+  document.getElementById('f_paymentDue').value = d.paymentDue||'';
+  document.getElementById('f_paymentReceived').value = d.paymentReceived||'';
+  document.getElementById('f_amountQuoted').value = d.amountQuoted||'';
+  document.getElementById('f_amountAgreed').value = d.amountAgreed||'';
+  document.getElementById('f_deliverables').value = d.deliverables||'';
+  document.getElementById('f_reliability').value = d.reliability||'';
+  document.getElementById('f_notes').value = d.notes||'';
+  closeModal('detailModal');
+  openModal('addModal');
+}
+
+function saveDeal() {
+  const brand = document.getElementById('f_brand').value.trim();
+  if (!brand) { alert('Brand name is required.'); return; }
+
+  const deal = {
+    id: editingId || uid(),
+    brand,
+    contact: document.getElementById('f_contact').value.trim(),
+    email: document.getElementById('f_email').value.trim(),
+    status: document.getElementById('f_status').value,
+    type: document.getElementById('f_type').value,
+    platform: document.getElementById('f_platform').value,
+    firstContact: document.getElementById('f_firstContact').value,
+    latestReply: document.getElementById('f_latestReply').value,
+    followUpDate: document.getElementById('f_followUp').value,
+    dueDate: document.getElementById('f_dueDate').value,
+    postedDate: document.getElementById('f_postedDate').value,
+    invoiceDate: document.getElementById('f_invoiceDate').value,
+    paymentDue: document.getElementById('f_paymentDue').value,
+    paymentReceived: document.getElementById('f_paymentReceived').value,
+    amountQuoted: document.getElementById('f_amountQuoted').value,
+    amountAgreed: document.getElementById('f_amountAgreed').value,
+    deliverables: document.getElementById('f_deliverables').value.trim(),
+    reliability: document.getElementById('f_reliability').value,
+    notes: document.getElementById('f_notes').value.trim(),
+  };
+
+  if (editingId) {
+    const idx = deals.findIndex(x => x.id === editingId);
+    if (idx !== -1) deals[idx] = deal;
+  } else {
+    deals.unshift(deal);
+  }
+
+  saveData();
+  closeModal('addModal');
+  renderDashboard();
+  renderTable();
+}
+
+function openDetail(id) {
+  const d = deals.find(x => x.id === id);
+  if (!d) return;
+  viewingId = id;
+  document.getElementById('detail_brand').textContent = d.brand;
+  document.getElementById('detail_contact').textContent = [d.contact, d.email].filter(Boolean).join(' · ') || 'No contact info';
+
+  const t = today();
+  const alerts = [];
+  if (d.followUpDate && d.followUpDate <= t && !['paid','closed / no'].includes(d.status))
+    alerts.push(`<div class="followup-banner">⏰ Follow-up is due (${fmtDate(d.followUpDate)})</div>`);
+  if (d.dueDate && d.dueDate < t && !['posted','paid'].includes(d.status))
+    alerts.push(`<div class="alert-banner">🔴 Content was due ${fmtDate(d.dueDate)}</div>`);
+  if (d.paymentDue && d.paymentDue < t && d.status !== 'paid')
+    alerts.push(`<div class="alert-banner">💸 Payment was due ${fmtDate(d.paymentDue)}</div>`);
+
+  document.getElementById('detailBody').innerHTML = `
+    ${alerts.join('')}
+    <div class="detail-section">
+      <h3>Status & Deal</h3>
+      <div class="detail-grid">
+        <div class="detail-item"><div class="detail-label">Status</div><div class="detail-value">${statusBadge(d.status)}</div></div>
+        <div class="detail-item"><div class="detail-label">Type</div><div class="detail-value">${typeBadge(d.type)}</div></div>
+        <div class="detail-item"><div class="detail-label">Platform</div><div class="detail-value">${d.platform||'—'}</div></div>
+        <div class="detail-item"><div class="detail-label">Reliability</div><div class="detail-value">${reliabilityDot(d.reliability)}</div></div>
+      </div>
+    </div>
+    <div class="detail-section">
+      <h3>Deliverables</h3>
+      <div style="font-size:13.5px">${d.deliverables||'Not specified'}</div>
+    </div>
+    <div class="detail-section">
+      <h3>Financials</h3>
+      <div class="detail-grid">
+        <div class="detail-item"><div class="detail-label">Quoted</div><div class="detail-value">${d.amountQuoted ? '$'+parseFloat(d.amountQuoted).toLocaleString() : '—'}</div></div>
+        <div class="detail-item"><div class="detail-label">Agreed</div><div class="detail-value" style="color:var(--green)">${d.amountAgreed ? '$'+parseFloat(d.amountAgreed).toLocaleString() : '—'}</div></div>
+        <div class="detail-item"><div class="detail-label">Invoice Sent</div><div class="detail-value">${fmtDate(d.invoiceDate)}</div></div>
+        <div class="detail-item"><div class="detail-label">Payment Due</div><div class="detail-value ${d.paymentDue && d.paymentDue < t && d.status!=='paid' ? 'date-overdue' : ''}">${fmtDate(d.paymentDue)}</div></div>
+        <div class="detail-item"><div class="detail-label">Payment Received</div><div class="detail-value" style="color:var(--green)">${fmtDate(d.paymentReceived)}</div></div>
+      </div>
+    </div>
+    <div class="detail-section">
+      <h3>Timeline</h3>
+      <div class="detail-grid">
+        <div class="detail-item"><div class="detail-label">First Contacted</div><div class="detail-value">${fmtDate(d.firstContact)}</div></div>
+        <div class="detail-item"><div class="detail-label">Latest Reply</div><div class="detail-value">${fmtDate(d.latestReply)}</div></div>
+        <div class="detail-item"><div class="detail-label">Follow-Up</div><div class="detail-value ${d.followUpDate && d.followUpDate <= t ? 'date-overdue' : ''}">${fmtDate(d.followUpDate)}</div></div>
+        <div class="detail-item"><div class="detail-label">Content Due</div><div class="detail-value ${d.dueDate && d.dueDate < t && !['posted','paid'].includes(d.status) ? 'date-overdue' : ''}">${fmtDate(d.dueDate)}</div></div>
+        <div class="detail-item"><div class="detail-label">Posted</div><div class="detail-value">${fmtDate(d.postedDate)}</div></div>
+      </div>
+    </div>
+    ${d.notes ? `<div class="detail-section"><h3>Notes</h3><div style="font-size:13px;line-height:1.6;color:var(--ink-light)">${d.notes.replace(/\n/g,'<br>')}</div></div>` : ''}
+  `;
+  openModal('detailModal');
+}
+
+function editFromDetail() {
+  openEdit(viewingId);
+}
+
+function deleteDealFromDetail() {
+  const d = deals.find(x => x.id === viewingId);
+  if (!d) return;
+  if (!confirm(`Delete "${d.brand}"? This cannot be undone.`)) return;
+  deals = deals.filter(x => x.id !== viewingId);
+  saveData();
+  closeModal('detailModal');
+  renderDashboard();
+  renderTable();
+}
+
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// Close on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) closeModal(overlay.id);
+  });
+});
+
+// ── EXPORT ────────────────────────────────────────────────────────────────────
+
+function exportCSV() {
+  const cols = ['brand','contact','email','status','type','platform','firstContact','latestReply','followUpDate','dueDate','postedDate','invoiceDate','paymentDue','paymentReceived','amountQuoted','amountAgreed','deliverables','reliability','notes'];
+  const header = ['Brand','Contact','Email','Status','Type','Platform','First Contact','Latest Reply','Follow Up','Due Date','Posted','Invoice Sent','Pmt Due','Pmt Received','Quoted $','Agreed $','Deliverables','Reliability','Notes'];
+  const rows = [header, ...deals.map(d => cols.map(c => `"${(d[c]||'').replace(/"/g,'""')}"`))];
+  const csv = rows.map(r => r.join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `creator-crm-${today()}.csv`;
+  a.click();
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+
+loadData();
+renderDashboard();
+renderTable();
+</script>
+</body>
+</html>
