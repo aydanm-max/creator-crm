@@ -1699,9 +1699,22 @@ function switchMainTab(tab, el) {
 
 // ── INSTAGRAM DASHBOARD ──────────────────────────────────────────────────────
 
-const IG_TOKEN = 'EAAUNafE0YBYBRBHjAKTx1StlJgKXpenLW8R5CYQNuYRUL4X0sy66OqBUscRyXKQBrxvt3VLyxDc9v2sQrXoyguY3d8e6x3RcyRBpnMzBFsWG2VT0rYvirj98mXcMAgrijbDfVcC5lQZCn8DyZA882GGmZA625w4TMSfhyvzZANw3iE7NTw2cDBKgAts3rDscqxXTIQ8Ym9lxkeawEuNUcwiADE37N6j1UV10Ow7d9Ha9EhFcLeF34VLQAQRskZBOeCMfUrevOOYm9ucVZBK9l70QZDZD';
+const IG_TOKEN = 'EAAUNafE0YBYBRDxzRF9Cc9OimZBZAmaTxtIN6xtu5bt93YMdl2gc8IjlyVU0XF59iKJQNjM6qTPa6cxZBEdQhZCRjb52dHFjguSYiFpvSLibdfipOwsLM3BbqAAJVeNd4qZBprCwbQ7geDZCgX42IUNY4nNFot4RjonECTUjiZAp9pc6dEULCqwHIPXAJwmW2mkTJWMdXNkZAaY0XYMPPj88n1V2FTFD9hsbXJHZACMQuk55IRbk67s5bS1Cs22plwSNcCZABHZCKuZAUVkAQnduyhw9NgZDZD';
+const IG_ACCOUNT_ID = '17841400262020204';
 const IG_API = 'https://graph.facebook.com/v19.0';
-let igAccountId = null;
+
+// Manual stats stored in localStorage
+const IG_MANUAL_KEY = 'ig_manual_stats';
+
+function getManualStats() {
+  try {
+    return JSON.parse(localStorage.getItem(IG_MANUAL_KEY)) || {};
+  } catch { return {}; }
+}
+
+function saveManualStats(stats) {
+  localStorage.setItem(IG_MANUAL_KEY, JSON.stringify(stats));
+}
 
 async function igFetch(url) {
   const sep = url.includes('?') ? '&' : '?';
@@ -1709,22 +1722,13 @@ async function igFetch(url) {
   return res.json();
 }
 
-async function findInstagramAccount() {
-  // Get pages linked to this user, then find IG business account
-  const pages = await igFetch(IG_API + '/me/accounts?fields=instagram_business_account,name,access_token');
-  if (pages.data && pages.data.length > 0) {
-    for (const page of pages.data) {
-      if (page.instagram_business_account) {
-        return page.instagram_business_account.id;
-      }
-    }
-  }
-  // Try the known page ID from the token's granted scopes
-  const pageCheck = await igFetch(IG_API + '/114087871754844?fields=instagram_business_account');
-  if (pageCheck.instagram_business_account) {
-    return pageCheck.instagram_business_account.id;
-  }
-  return null;
+function fmtNum(n) {
+  if (n === null || n === undefined || n === '') return '—';
+  n = Number(n);
+  if (isNaN(n)) return '—';
+  if (n >= 1000000) return (n/1000000).toFixed(1) + 'M';
+  if (n >= 1000) return (n/1000).toFixed(1) + 'K';
+  return n.toLocaleString();
 }
 
 async function loadInstagramData() {
@@ -1732,88 +1736,46 @@ async function loadInstagramData() {
   container.innerHTML = `<div class="ig-loading"><div class="ig-loading-spinner"></div><div>Loading Instagram analytics...</div></div>`;
 
   try {
-    // Step 1: Find the IG account
-    if (!igAccountId) {
-      igAccountId = await findInstagramAccount();
-    }
-
-    if (!igAccountId) {
-      renderIgPermissionError(container);
-      return;
-    }
-
-    // Step 2: Fetch all data in parallel
-    const [profile, media, insights28, audienceCity, audienceCountry, audienceGender] = await Promise.all([
-      igFetch(`${IG_API}/${igAccountId}?fields=username,name,profile_picture_url,followers_count,follows_count,media_count,biography`),
-      igFetch(`${IG_API}/${igAccountId}/media?fields=id,caption,media_type,media_url,thumbnail_url,permalink,timestamp,like_count,comments_count&limit=25`),
-      igFetch(`${IG_API}/${igAccountId}/insights?metric=reach,impressions,follower_count,accounts_engaged&period=day&since=${Math.floor(Date.now()/1000) - 28*86400}&until=${Math.floor(Date.now()/1000)}`).catch(() => null),
-      igFetch(`${IG_API}/${igAccountId}/insights?metric=follower_demographics&period=lifetime&metric_type=total_value&breakdown=city`).catch(() => null),
-      igFetch(`${IG_API}/${igAccountId}/insights?metric=follower_demographics&period=lifetime&metric_type=total_value&breakdown=country`).catch(() => null),
-      igFetch(`${IG_API}/${igAccountId}/insights?metric=follower_demographics&period=lifetime&metric_type=total_value&breakdown=age,gender`).catch(() => null),
+    const [profile, media] = await Promise.all([
+      igFetch(`${IG_API}/${IG_ACCOUNT_ID}?fields=username,name,profile_picture_url,followers_count,follows_count,media_count,biography`),
+      igFetch(`${IG_API}/${IG_ACCOUNT_ID}/media?fields=id,caption,media_type,media_url,thumbnail_url,permalink,timestamp,like_count,comments_count&limit=25`),
     ]);
 
     if (profile.error) {
-      renderIgPermissionError(container, profile.error.message);
+      container.innerHTML = `<div class="ig-error"><h3>API Error</h3><p>${profile.error.message}</p><p style="margin-top:12px;"><button class="btn btn-primary" onclick="loadInstagramData()">Retry</button></p></div>`;
       return;
     }
 
     igDataLoaded = true;
-    renderIgDashboard(container, profile, media, insights28, audienceCity, audienceCountry, audienceGender);
+    renderIgDashboard(container, profile, media);
 
   } catch (err) {
-    container.innerHTML = `<div class="ig-error"><h3>Connection Error</h3><p>${err.message}</p></div>`;
+    container.innerHTML = `<div class="ig-error"><h3>Connection Error</h3><p>${err.message}</p><p style="margin-top:12px;"><button class="btn btn-primary" onclick="loadInstagramData()">Retry</button></p></div>`;
   }
 }
 
-function renderIgPermissionError(container, apiMsg) {
-  container.innerHTML = `
-    <div class="ig-error">
-      <h3>Instagram Permissions Needed</h3>
-      <p>Your access token is valid but is missing required permissions to read Instagram data.</p>
-      ${apiMsg ? `<p style="font-size:11px;color:var(--ink-muted);margin-top:4px;">API: ${apiMsg}</p>` : ''}
-      <p style="margin-top:12px;"><strong>To fix this, regenerate your token with these permissions:</strong></p>
-      <p><code>instagram_basic</code> &nbsp; <code>instagram_manage_insights</code> &nbsp; <code>pages_show_list</code> &nbsp; <code>pages_read_engagement</code></p>
-      <p style="margin-top:8px;">Also make sure your Instagram account is a <strong>Business</strong> or <strong>Creator</strong> account linked to a Facebook Page.</p>
-      <p style="margin-top:12px;"><button class="btn btn-primary" onclick="loadInstagramData()">Retry</button></p>
-    </div>
-  `;
-}
-
-function sumInsightValues(insightsResp, metricName) {
-  if (!insightsResp || !insightsResp.data) return null;
-  const metric = insightsResp.data.find(m => m.name === metricName);
-  if (!metric || !metric.values) return null;
-  return metric.values.reduce((sum, v) => sum + (v.value || 0), 0);
-}
-
-function getInsightBreakdown(insightsResp, metricName) {
-  if (!insightsResp || !insightsResp.data) return [];
-  const metric = insightsResp.data.find(m => m.name === metricName);
-  if (!metric) return [];
-  // For total_value breakdown format
-  if (metric.total_value && metric.total_value.breakdowns) {
-    const results = metric.total_value.breakdowns[0]?.results || [];
-    return results.map(r => ({
-      label: r.dimension_values.join(', '),
-      value: r.value
-    })).sort((a, b) => b.value - a.value);
+function saveManualField(field) {
+  const input = document.getElementById('manual_' + field);
+  if (!input) return;
+  const stats = getManualStats();
+  stats[field] = input.value;
+  stats.lastUpdated = new Date().toISOString();
+  saveManualStats(stats);
+  // Update the display value next to the input
+  const display = document.getElementById('display_' + field);
+  if (display) display.textContent = field === 'nonFollowerPct' ? (input.value ? input.value + '%' : '—') : fmtNum(input.value);
+  // Flash saved indicator
+  const btn = input.nextElementSibling;
+  if (btn) {
+    const orig = btn.textContent;
+    btn.textContent = 'Saved';
+    btn.style.background = 'var(--green)';
+    setTimeout(() => { btn.textContent = orig; btn.style.background = ''; }, 1200);
   }
-  return [];
 }
 
-function fmtNum(n) {
-  if (n === null || n === undefined) return '—';
-  if (n >= 1000000) return (n/1000000).toFixed(1) + 'M';
-  if (n >= 1000) return (n/1000).toFixed(1) + 'K';
-  return n.toLocaleString();
-}
-
-function renderIgDashboard(container, profile, media, insights28, audienceCity, audienceCountry, audienceGender) {
-  const reach = sumInsightValues(insights28, 'reach');
-  const impressions = sumInsightValues(insights28, 'impressions');
-  const engaged = sumInsightValues(insights28, 'accounts_engaged');
-  const nonFollowerPct = (reach && profile.followers_count) ?
-    Math.max(0, Math.min(100, Math.round(((reach - (engaged || 0)) / reach) * 100))) : null;
+function renderIgDashboard(container, profile, media) {
+  const manual = getManualStats();
 
   // Top posts by engagement
   const posts = (media && media.data) ? media.data : [];
@@ -1821,11 +1783,6 @@ function renderIgDashboard(container, profile, media, insights28, audienceCity, 
     .map(p => ({ ...p, engagement: (p.like_count||0) + (p.comments_count||0) }))
     .sort((a,b) => b.engagement - a.engagement)
     .slice(0, 6);
-
-  // Audience breakdowns
-  const cities = getInsightBreakdown(audienceCity, 'follower_demographics').slice(0, 8);
-  const countries = getInsightBreakdown(audienceCountry, 'follower_demographics').slice(0, 8);
-  const genderAge = getInsightBreakdown(audienceGender, 'follower_demographics').slice(0, 10);
 
   // Active brand deals from CRM
   const activeDeals = deals.filter(d => !['paid','closed / no'].includes(d.status));
@@ -1843,39 +1800,85 @@ function renderIgDashboard(container, profile, media, insights28, audienceCity, 
     'posted': 'var(--green)', 'invoice sent': 'var(--blue)', 'paid': 'var(--green)'
   };
 
+  // Engagement rate from API data
+  const totalLikes = posts.reduce((s,p) => s + (p.like_count||0), 0);
+  const totalComments = posts.reduce((s,p) => s + (p.comments_count||0), 0);
+  const engRate = profile.followers_count ? (((totalLikes + totalComments) / posts.length / profile.followers_count) * 100).toFixed(2) : '—';
+
+  const lastUpdated = manual.lastUpdated ? new Date(manual.lastUpdated).toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}) : 'never';
+
   container.innerHTML = `
-    <h2 class="ig-section-title" style="margin-top:0;">Instagram Overview — @${profile.username || 'account'}</h2>
+    <h2 class="ig-section-title" style="margin-top:0;display:flex;align-items:center;gap:12px;">
+      ${profile.profile_picture_url ? `<img src="${profile.profile_picture_url}" style="width:36px;height:36px;border-radius:50%;border:2px solid var(--border);" onerror="this.style.display='none'">` : ''}
+      @${profile.username}
+      <span style="font-family:'DM Sans',sans-serif;font-size:12px;font-weight:400;color:var(--ink-muted);margin-left:auto;">Live from Instagram API</span>
+    </h2>
+
+    <!-- ROW 1: API Stats -->
     <div class="ig-stats-grid">
       <div class="ig-stat-card purple">
         <div class="ig-stat-label">Followers</div>
         <div class="ig-stat-value">${fmtNum(profile.followers_count)}</div>
         <div class="ig-stat-sub">${fmtNum(profile.media_count)} posts · ${fmtNum(profile.follows_count)} following</div>
       </div>
-      <div class="ig-stat-card blue">
-        <div class="ig-stat-label">Reach (28 days)</div>
-        <div class="ig-stat-value">${fmtNum(reach)}</div>
-        <div class="ig-stat-sub">${nonFollowerPct !== null ? nonFollowerPct + '% non-followers' : 'insights loading...'}</div>
+      <div class="ig-stat-card green">
+        <div class="ig-stat-label">Avg Engagement Rate</div>
+        <div class="ig-stat-value">${engRate}%</div>
+        <div class="ig-stat-sub">avg per post (last 25)</div>
       </div>
       <div class="ig-stat-card accent">
-        <div class="ig-stat-label">Impressions (28 days)</div>
-        <div class="ig-stat-value">${fmtNum(impressions)}</div>
-        <div class="ig-stat-sub">${reach ? (impressions/reach).toFixed(1) + 'x frequency' : '—'}</div>
+        <div class="ig-stat-label">Total Likes (Recent)</div>
+        <div class="ig-stat-value">${fmtNum(totalLikes)}</div>
+        <div class="ig-stat-sub">across last ${posts.length} posts</div>
       </div>
-      <div class="ig-stat-card green">
-        <div class="ig-stat-label">Accounts Engaged (28 days)</div>
-        <div class="ig-stat-value">${fmtNum(engaged)}</div>
-        <div class="ig-stat-sub">${profile.followers_count && engaged ? ((engaged/profile.followers_count)*100).toFixed(1) + '% engagement rate' : '—'}</div>
+      <div class="ig-stat-card blue">
+        <div class="ig-stat-label">Total Comments (Recent)</div>
+        <div class="ig-stat-value">${fmtNum(totalComments)}</div>
+        <div class="ig-stat-sub">across last ${posts.length} posts</div>
       </div>
     </div>
 
+    <!-- ROW 2: Manual Stats -->
+    <h2 class="ig-section-title" style="display:flex;align-items:baseline;gap:10px;">
+      Manual Insights
+      <span style="font-family:'DM Sans',sans-serif;font-size:11px;font-weight:400;color:var(--ink-muted);">Last updated: ${lastUpdated} · Enter from Instagram app insights</span>
+    </h2>
+    <div class="ig-stats-grid" style="grid-template-columns:repeat(3,1fr);">
+      <div class="ig-stat-card" style="background:white;">
+        <div class="ig-stat-label">Reach (28 days)</div>
+        <div class="ig-stat-value" id="display_reach">${fmtNum(manual.reach)}</div>
+        <div style="display:flex;gap:6px;margin-top:10px;">
+          <input type="number" id="manual_reach" value="${manual.reach||''}" placeholder="e.g. 45000" style="flex:1;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-family:'DM Sans',sans-serif;background:var(--cream);outline:none;">
+          <button class="btn btn-primary btn-sm" onclick="saveManualField('reach')">Save</button>
+        </div>
+      </div>
+      <div class="ig-stat-card" style="background:white;">
+        <div class="ig-stat-label">Impressions (28 days)</div>
+        <div class="ig-stat-value" id="display_impressions">${fmtNum(manual.impressions)}</div>
+        <div style="display:flex;gap:6px;margin-top:10px;">
+          <input type="number" id="manual_impressions" value="${manual.impressions||''}" placeholder="e.g. 120000" style="flex:1;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-family:'DM Sans',sans-serif;background:var(--cream);outline:none;">
+          <button class="btn btn-primary btn-sm" onclick="saveManualField('impressions')">Save</button>
+        </div>
+      </div>
+      <div class="ig-stat-card" style="background:white;">
+        <div class="ig-stat-label">Non-Follower Reach %</div>
+        <div class="ig-stat-value" id="display_nonFollowerPct">${manual.nonFollowerPct ? manual.nonFollowerPct + '%' : '—'}</div>
+        <div style="display:flex;gap:6px;margin-top:10px;">
+          <input type="number" id="manual_nonFollowerPct" value="${manual.nonFollowerPct||''}" placeholder="e.g. 62" min="0" max="100" style="flex:1;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-family:'DM Sans',sans-serif;background:var(--cream);outline:none;">
+          <button class="btn btn-primary btn-sm" onclick="saveManualField('nonFollowerPct')">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOP POSTS -->
     <h2 class="ig-section-title">Top Performing Posts</h2>
     ${topPosts.length ? `<div class="ig-posts-grid">
       ${topPosts.map(p => `
         <a href="${p.permalink}" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;">
           <div class="ig-post-card">
-            <img class="ig-post-img" src="${p.media_type === 'VIDEO' ? (p.thumbnail_url || '') : (p.media_url || '')}" alt="" onerror="this.style.display='none'">
+            <img class="ig-post-img" src="${p.media_type === 'VIDEO' ? (p.thumbnail_url || '') : (p.media_url || '')}" alt="" onerror="this.style.background='var(--cream)';this.style.minHeight='120px';">
             <div class="ig-post-body">
-              <div class="ig-post-caption">${(p.caption||'No caption').substring(0,120)}</div>
+              <div class="ig-post-caption">${(p.caption||'No caption').replace(/</g,'&lt;').substring(0,120)}</div>
               <div class="ig-post-metrics">
                 <div class="ig-post-metric"><span>${fmtNum(p.like_count)}</span> likes</div>
                 <div class="ig-post-metric"><span>${fmtNum(p.comments_count)}</span> comments</div>
@@ -1887,32 +1890,27 @@ function renderIgDashboard(container, profile, media, insights28, audienceCity, 
       `).join('')}
     </div>` : '<p style="color:var(--ink-muted)">No posts found.</p>'}
 
+    <!-- AUDIENCE BREAKDOWN -->
     <h2 class="ig-section-title">Audience Breakdown</h2>
     <div class="ig-audience-grid">
       <div class="ig-audience-card">
-        <h4>Top Cities</h4>
-        ${cities.length ? renderBarChart(cities) : '<p style="color:var(--ink-muted);font-size:12px;">Audience data requires <code>instagram_manage_insights</code> permission.</p>'}
-      </div>
-      <div class="ig-audience-card">
-        <h4>Top Countries</h4>
-        ${countries.length ? renderBarChart(countries) : '<p style="color:var(--ink-muted);font-size:12px;">Audience data requires <code>instagram_manage_insights</code> permission.</p>'}
-      </div>
-      <div class="ig-audience-card">
-        <h4>Age & Gender</h4>
-        ${genderAge.length ? renderBarChart(genderAge) : '<p style="color:var(--ink-muted);font-size:12px;">Audience data requires <code>instagram_manage_insights</code> permission.</p>'}
-      </div>
-      <div class="ig-audience-card">
         <h4>Account Summary</h4>
-        <div style="font-size:13px;line-height:2;">
-          <div><strong>Username:</strong> @${profile.username || '—'}</div>
-          <div><strong>Name:</strong> ${profile.name || '—'}</div>
-          <div><strong>Posts:</strong> ${fmtNum(profile.media_count)}</div>
-          <div><strong>Followers:</strong> ${fmtNum(profile.followers_count)}</div>
-          <div><strong>Following:</strong> ${fmtNum(profile.follows_count)}</div>
+        <div style="font-size:13px;line-height:2.2;">
+          <div style="display:flex;justify-content:space-between;"><span style="color:var(--ink-muted);">Username</span> <strong>@${profile.username}</strong></div>
+          <div style="display:flex;justify-content:space-between;"><span style="color:var(--ink-muted);">Name</span> <strong>${profile.name || '—'}</strong></div>
+          <div style="display:flex;justify-content:space-between;"><span style="color:var(--ink-muted);">Posts</span> <strong>${fmtNum(profile.media_count)}</strong></div>
+          <div style="display:flex;justify-content:space-between;"><span style="color:var(--ink-muted);">Followers</span> <strong>${fmtNum(profile.followers_count)}</strong></div>
+          <div style="display:flex;justify-content:space-between;"><span style="color:var(--ink-muted);">Following</span> <strong>${fmtNum(profile.follows_count)}</strong></div>
+          <div style="display:flex;justify-content:space-between;"><span style="color:var(--ink-muted);">Engagement Rate</span> <strong>${engRate}%</strong></div>
         </div>
+      </div>
+      <div class="ig-audience-card">
+        <h4>Post Type Breakdown</h4>
+        ${renderPostTypeBreakdown(posts)}
       </div>
     </div>
 
+    <!-- BRAND DEALS -->
     <h2 class="ig-section-title">Active Brand Deals</h2>
     ${activeDeals.length ? `
       <div style="margin-bottom:12px;font-size:13px;color:var(--ink-muted);">
@@ -1922,7 +1920,7 @@ function renderIgDashboard(container, profile, media, insights28, audienceCity, 
         ${activeDeals.slice(0,6).map(d => `
           <div class="ig-deal-card">
             <div class="ig-deal-icon" style="background:${(statusColors[d.status]||'var(--ink-muted)') + '20'};color:${statusColors[d.status]||'var(--ink-muted)'};">
-              ${d.type==='paid'?'$':d.type==='gifted'?'🎁':d.type==='affiliate'?'🔗':'📸'}
+              ${d.type==='paid'?'$':d.type==='gifted'?'&#127873;':d.type==='affiliate'?'&#128279;':'&#128248;'}
             </div>
             <div class="ig-deal-info">
               <div class="ig-deal-brand">${d.brand}</div>
@@ -1934,6 +1932,7 @@ function renderIgDashboard(container, profile, media, insights28, audienceCity, 
       </div>
     ` : '<p style="color:var(--ink-muted);">No active deals. Add brands in the CRM tab!</p>'}
 
+    <!-- CONTENT PIPELINE -->
     <h2 class="ig-section-title">Content Pipeline</h2>
     ${pipelineDeals.length ? `
       <div class="ig-pipeline-list">
@@ -1952,16 +1951,21 @@ function renderIgDashboard(container, profile, media, insights28, audienceCity, 
   `;
 }
 
-function renderBarChart(data) {
-  const maxVal = Math.max(...data.map(d => d.value));
-  const total = data.reduce((s, d) => s + d.value, 0);
-  return data.map(d => {
-    const pct = total > 0 ? ((d.value / total) * 100).toFixed(1) : 0;
-    const width = maxVal > 0 ? ((d.value / maxVal) * 100) : 0;
+function renderPostTypeBreakdown(posts) {
+  const counts = {};
+  posts.forEach(p => { counts[p.media_type] = (counts[p.media_type]||0) + 1; });
+  const types = Object.entries(counts).sort((a,b) => b[1] - a[1]);
+  const total = posts.length;
+  const labels = { 'VIDEO': 'Reels / Video', 'CAROUSEL_ALBUM': 'Carousels', 'IMAGE': 'Photos' };
+  const colors = { 'VIDEO': 'var(--purple)', 'CAROUSEL_ALBUM': 'var(--blue)', 'IMAGE': 'var(--accent)' };
+  if (!types.length) return '<p style="color:var(--ink-muted);font-size:12px;">No post data available.</p>';
+  return types.map(([type, count]) => {
+    const pct = ((count/total)*100).toFixed(0);
+    const width = ((count / types[0][1]) * 100);
     return `<div class="ig-bar-row">
-      <div class="ig-bar-label">${d.label}</div>
-      <div class="ig-bar-track"><div class="ig-bar-fill" style="width:${width}%"></div></div>
-      <div class="ig-bar-pct">${pct}%</div>
+      <div class="ig-bar-label">${labels[type]||type}</div>
+      <div class="ig-bar-track"><div class="ig-bar-fill" style="width:${width}%;background:${colors[type]||'var(--accent)'}"></div></div>
+      <div class="ig-bar-pct">${count} (${pct}%)</div>
     </div>`;
   }).join('');
 }
