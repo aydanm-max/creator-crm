@@ -569,6 +569,294 @@
     .dashboard-inner { grid-template-columns: repeat(2, 1fr); }
     .header h1 { font-size: 18px; }
     .container { padding: 0 14px; }
+    .nav-tabs { gap: 2px; }
+    .nav-tab { padding: 6px 12px; font-size: 12px; }
+  }
+
+  /* NAV TABS */
+  .nav-tabs {
+    display: flex;
+    gap: 4px;
+    margin-left: 32px;
+  }
+  .nav-tab {
+    padding: 7px 18px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    color: rgba(255,255,255,0.5);
+    transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .nav-tab:hover { color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.06); }
+  .nav-tab.active { background: rgba(255,255,255,0.12); color: white; }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* IG DASHBOARD */
+  .ig-dashboard { padding: 24px 0 40px; }
+  .ig-dashboard .container { max-width: 1400px; margin: 0 auto; padding: 0 24px; }
+
+  .ig-section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    margin: 28px 0 14px;
+    color: var(--ink);
+  }
+  .ig-section-title:first-child { margin-top: 0; }
+
+  .ig-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+  @media (max-width: 900px) { .ig-stats-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px) { .ig-stats-grid { grid-template-columns: 1fr; } }
+
+  .ig-stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+  }
+  .ig-stat-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin-bottom: 8px;
+  }
+  .ig-stat-value {
+    font-family: 'DM Serif Display', serif;
+    font-size: 32px;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .ig-stat-sub {
+    font-size: 11px;
+    color: var(--ink-muted);
+    margin-top: 6px;
+  }
+  .ig-stat-card.purple .ig-stat-value { color: var(--purple); }
+  .ig-stat-card.blue .ig-stat-value { color: var(--blue); }
+  .ig-stat-card.green .ig-stat-value { color: var(--green); }
+  .ig-stat-card.accent .ig-stat-value { color: var(--accent); }
+
+  .ig-posts-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  @media (max-width: 900px) { .ig-posts-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px) { .ig-posts-grid { grid-template-columns: 1fr; } }
+
+  .ig-post-card {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .ig-post-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+  .ig-post-img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    display: block;
+    background: var(--cream);
+  }
+  .ig-post-body { padding: 14px; }
+  .ig-post-caption {
+    font-size: 12px;
+    color: var(--ink-light);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 10px;
+    line-height: 1.4;
+  }
+  .ig-post-metrics {
+    display: flex;
+    gap: 14px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .ig-post-metric { color: var(--ink-muted); }
+  .ig-post-metric span { color: var(--ink); font-weight: 600; }
+
+  .ig-audience-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  @media (max-width: 600px) { .ig-audience-grid { grid-template-columns: 1fr; } }
+
+  .ig-audience-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+  }
+  .ig-audience-card h4 {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin-bottom: 14px;
+  }
+  .ig-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+    font-size: 12px;
+  }
+  .ig-bar-label {
+    width: 100px;
+    flex-shrink: 0;
+    color: var(--ink-light);
+    text-align: right;
+    font-weight: 500;
+  }
+  .ig-bar-track {
+    flex: 1;
+    height: 8px;
+    background: var(--cream);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .ig-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: var(--accent);
+    transition: width 0.5s ease;
+  }
+  .ig-bar-pct {
+    width: 40px;
+    font-size: 11px;
+    color: var(--ink-muted);
+    font-weight: 600;
+  }
+
+  .ig-deals-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  @media (max-width: 600px) { .ig-deals-grid { grid-template-columns: 1fr; } }
+
+  .ig-deal-card {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .ig-deal-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .ig-deal-info { flex: 1; min-width: 0; }
+  .ig-deal-brand {
+    font-weight: 600;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .ig-deal-meta {
+    font-size: 12px;
+    color: var(--ink-muted);
+    margin-top: 2px;
+  }
+  .ig-deal-amount {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    color: var(--green);
+    flex-shrink: 0;
+  }
+
+  .ig-pipeline-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .ig-pipeline-item {
+    background: white;
+    border-radius: 10px;
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: var(--shadow);
+  }
+  .ig-pipeline-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .ig-pipeline-info { flex: 1; }
+  .ig-pipeline-brand { font-weight: 600; font-size: 13px; }
+  .ig-pipeline-meta { font-size: 11px; color: var(--ink-muted); margin-top: 2px; }
+  .ig-pipeline-date { font-size: 11px; color: var(--ink-muted); flex-shrink: 0; }
+
+  .ig-loading {
+    text-align: center;
+    padding: 60px 24px;
+    color: var(--ink-muted);
+  }
+  .ig-loading-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 12px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .ig-error {
+    background: var(--accent-pale);
+    border: 1px solid #e8d4b8;
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+    color: var(--ink-light);
+  }
+  .ig-error h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    margin-bottom: 8px;
+    color: var(--ink);
+  }
+  .ig-error p { font-size: 13px; line-height: 1.6; margin-bottom: 6px; }
+  .ig-error code {
+    background: rgba(0,0,0,0.06);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
   }
 </style>
 </head>
@@ -578,15 +866,39 @@
 <header class="header">
 <div id="loadingBar" style="display:none;position:fixed;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#c17f3b,#f5e8d6,#c17f3b);background-size:200%;animation:shimmer 1.5s infinite;z-index:9999;"></div>
 <style>@keyframes shimmer{0%{background-position:200%}100%{background-position:-200%}}</style>
-  <div class="header-brand">
-    <h1>Brand CRM</h1>
-    <span class="header-sub">@thesearethedaysillmiss</span>
+  <div style="display:flex;align-items:center;">
+    <div class="header-brand">
+      <h1>Creator CRM</h1>
+      <span class="header-sub">@thesearethedaysillmiss</span>
+    </div>
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="switchMainTab('crm', this)">Brand CRM</button>
+      <button class="nav-tab" onclick="switchMainTab('ig-dashboard', this)">Dashboard</button>
+    </div>
   </div>
-  <div class="header-actions">
+  <div class="header-actions" id="crmActions">
     <button class="btn btn-ghost btn-sm" onclick="exportCSV()">↓ Export CSV</button>
     <button class="btn btn-primary" onclick="openAddModal()">+ Add Brand</button>
   </div>
+  <div class="header-actions" id="igActions" style="display:none;">
+    <button class="btn btn-ghost btn-sm" onclick="loadInstagramData()">↻ Refresh</button>
+  </div>
 </header>
+
+<!-- IG DASHBOARD TAB -->
+<div class="tab-content" id="tab-ig-dashboard">
+  <div class="ig-dashboard">
+    <div class="container" id="igDashboardContent">
+      <div class="ig-loading">
+        <div class="ig-loading-spinner"></div>
+        <div>Loading Instagram analytics...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CRM TAB -->
+<div class="tab-content active" id="tab-crm">
 
 <!-- DASHBOARD -->
 <div class="dashboard">
@@ -787,6 +1099,9 @@
       <button class="btn btn-primary" onclick="editFromDetail()">Edit Deal</button>
     </div>
   </div>
+</div>
+
+<!-- END CRM TAB -->
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1362,6 +1677,293 @@ function exportCSV() {
   a.href = URL.createObjectURL(blob);
   a.download = `creator-crm-${today()}.csv`;
   a.click();
+}
+
+// ── TAB SWITCHING ─────────────────────────────────────────────────────────────
+
+let igDataLoaded = false;
+
+function switchMainTab(tab, el) {
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+
+  document.getElementById('crmActions').style.display = tab === 'crm' ? 'flex' : 'none';
+  document.getElementById('igActions').style.display = tab === 'ig-dashboard' ? 'flex' : 'none';
+
+  if (tab === 'ig-dashboard' && !igDataLoaded) {
+    loadInstagramData();
+  }
+}
+
+// ── INSTAGRAM DASHBOARD ──────────────────────────────────────────────────────
+
+const IG_TOKEN = 'EAAUNafE0YBYBRBHjAKTx1StlJgKXpenLW8R5CYQNuYRUL4X0sy66OqBUscRyXKQBrxvt3VLyxDc9v2sQrXoyguY3d8e6x3RcyRBpnMzBFsWG2VT0rYvirj98mXcMAgrijbDfVcC5lQZCn8DyZA882GGmZA625w4TMSfhyvzZANw3iE7NTw2cDBKgAts3rDscqxXTIQ8Ym9lxkeawEuNUcwiADE37N6j1UV10Ow7d9Ha9EhFcLeF34VLQAQRskZBOeCMfUrevOOYm9ucVZBK9l70QZDZD';
+const IG_API = 'https://graph.facebook.com/v19.0';
+let igAccountId = null;
+
+async function igFetch(url) {
+  const sep = url.includes('?') ? '&' : '?';
+  const res = await fetch(url + sep + 'access_token=' + IG_TOKEN);
+  return res.json();
+}
+
+async function findInstagramAccount() {
+  // Get pages linked to this user, then find IG business account
+  const pages = await igFetch(IG_API + '/me/accounts?fields=instagram_business_account,name,access_token');
+  if (pages.data && pages.data.length > 0) {
+    for (const page of pages.data) {
+      if (page.instagram_business_account) {
+        return page.instagram_business_account.id;
+      }
+    }
+  }
+  // Try the known page ID from the token's granted scopes
+  const pageCheck = await igFetch(IG_API + '/114087871754844?fields=instagram_business_account');
+  if (pageCheck.instagram_business_account) {
+    return pageCheck.instagram_business_account.id;
+  }
+  return null;
+}
+
+async function loadInstagramData() {
+  const container = document.getElementById('igDashboardContent');
+  container.innerHTML = `<div class="ig-loading"><div class="ig-loading-spinner"></div><div>Loading Instagram analytics...</div></div>`;
+
+  try {
+    // Step 1: Find the IG account
+    if (!igAccountId) {
+      igAccountId = await findInstagramAccount();
+    }
+
+    if (!igAccountId) {
+      renderIgPermissionError(container);
+      return;
+    }
+
+    // Step 2: Fetch all data in parallel
+    const [profile, media, insights28, audienceCity, audienceCountry, audienceGender] = await Promise.all([
+      igFetch(`${IG_API}/${igAccountId}?fields=username,name,profile_picture_url,followers_count,follows_count,media_count,biography`),
+      igFetch(`${IG_API}/${igAccountId}/media?fields=id,caption,media_type,media_url,thumbnail_url,permalink,timestamp,like_count,comments_count&limit=25`),
+      igFetch(`${IG_API}/${igAccountId}/insights?metric=reach,impressions,follower_count,accounts_engaged&period=day&since=${Math.floor(Date.now()/1000) - 28*86400}&until=${Math.floor(Date.now()/1000)}`).catch(() => null),
+      igFetch(`${IG_API}/${igAccountId}/insights?metric=follower_demographics&period=lifetime&metric_type=total_value&breakdown=city`).catch(() => null),
+      igFetch(`${IG_API}/${igAccountId}/insights?metric=follower_demographics&period=lifetime&metric_type=total_value&breakdown=country`).catch(() => null),
+      igFetch(`${IG_API}/${igAccountId}/insights?metric=follower_demographics&period=lifetime&metric_type=total_value&breakdown=age,gender`).catch(() => null),
+    ]);
+
+    if (profile.error) {
+      renderIgPermissionError(container, profile.error.message);
+      return;
+    }
+
+    igDataLoaded = true;
+    renderIgDashboard(container, profile, media, insights28, audienceCity, audienceCountry, audienceGender);
+
+  } catch (err) {
+    container.innerHTML = `<div class="ig-error"><h3>Connection Error</h3><p>${err.message}</p></div>`;
+  }
+}
+
+function renderIgPermissionError(container, apiMsg) {
+  container.innerHTML = `
+    <div class="ig-error">
+      <h3>Instagram Permissions Needed</h3>
+      <p>Your access token is valid but is missing required permissions to read Instagram data.</p>
+      ${apiMsg ? `<p style="font-size:11px;color:var(--ink-muted);margin-top:4px;">API: ${apiMsg}</p>` : ''}
+      <p style="margin-top:12px;"><strong>To fix this, regenerate your token with these permissions:</strong></p>
+      <p><code>instagram_basic</code> &nbsp; <code>instagram_manage_insights</code> &nbsp; <code>pages_show_list</code> &nbsp; <code>pages_read_engagement</code></p>
+      <p style="margin-top:8px;">Also make sure your Instagram account is a <strong>Business</strong> or <strong>Creator</strong> account linked to a Facebook Page.</p>
+      <p style="margin-top:12px;"><button class="btn btn-primary" onclick="loadInstagramData()">Retry</button></p>
+    </div>
+  `;
+}
+
+function sumInsightValues(insightsResp, metricName) {
+  if (!insightsResp || !insightsResp.data) return null;
+  const metric = insightsResp.data.find(m => m.name === metricName);
+  if (!metric || !metric.values) return null;
+  return metric.values.reduce((sum, v) => sum + (v.value || 0), 0);
+}
+
+function getInsightBreakdown(insightsResp, metricName) {
+  if (!insightsResp || !insightsResp.data) return [];
+  const metric = insightsResp.data.find(m => m.name === metricName);
+  if (!metric) return [];
+  // For total_value breakdown format
+  if (metric.total_value && metric.total_value.breakdowns) {
+    const results = metric.total_value.breakdowns[0]?.results || [];
+    return results.map(r => ({
+      label: r.dimension_values.join(', '),
+      value: r.value
+    })).sort((a, b) => b.value - a.value);
+  }
+  return [];
+}
+
+function fmtNum(n) {
+  if (n === null || n === undefined) return '—';
+  if (n >= 1000000) return (n/1000000).toFixed(1) + 'M';
+  if (n >= 1000) return (n/1000).toFixed(1) + 'K';
+  return n.toLocaleString();
+}
+
+function renderIgDashboard(container, profile, media, insights28, audienceCity, audienceCountry, audienceGender) {
+  const reach = sumInsightValues(insights28, 'reach');
+  const impressions = sumInsightValues(insights28, 'impressions');
+  const engaged = sumInsightValues(insights28, 'accounts_engaged');
+  const nonFollowerPct = (reach && profile.followers_count) ?
+    Math.max(0, Math.min(100, Math.round(((reach - (engaged || 0)) / reach) * 100))) : null;
+
+  // Top posts by engagement
+  const posts = (media && media.data) ? media.data : [];
+  const topPosts = [...posts]
+    .map(p => ({ ...p, engagement: (p.like_count||0) + (p.comments_count||0) }))
+    .sort((a,b) => b.engagement - a.engagement)
+    .slice(0, 6);
+
+  // Audience breakdowns
+  const cities = getInsightBreakdown(audienceCity, 'follower_demographics').slice(0, 8);
+  const countries = getInsightBreakdown(audienceCountry, 'follower_demographics').slice(0, 8);
+  const genderAge = getInsightBreakdown(audienceGender, 'follower_demographics').slice(0, 10);
+
+  // Active brand deals from CRM
+  const activeDeals = deals.filter(d => !['paid','closed / no'].includes(d.status));
+  const totalPipeline = activeDeals.reduce((s, d) => s + (parseFloat(d.amountAgreed || d.amountQuoted) || 0), 0);
+
+  // Content pipeline
+  const pipelineDeals = deals
+    .filter(d => ['confirmed','content due','negotiating'].includes(d.status))
+    .sort((a,b) => (a.dueDate||'9999') < (b.dueDate||'9999') ? -1 : 1)
+    .slice(0, 6);
+
+  const statusColors = {
+    'confirmed': 'var(--accent)', 'content due': '#e8940a', 'negotiating': 'var(--yellow)',
+    'new': 'var(--ink-muted)', 'pitched': 'var(--blue)', 'replied': 'var(--purple)',
+    'posted': 'var(--green)', 'invoice sent': 'var(--blue)', 'paid': 'var(--green)'
+  };
+
+  container.innerHTML = `
+    <h2 class="ig-section-title" style="margin-top:0;">Instagram Overview — @${profile.username || 'account'}</h2>
+    <div class="ig-stats-grid">
+      <div class="ig-stat-card purple">
+        <div class="ig-stat-label">Followers</div>
+        <div class="ig-stat-value">${fmtNum(profile.followers_count)}</div>
+        <div class="ig-stat-sub">${fmtNum(profile.media_count)} posts · ${fmtNum(profile.follows_count)} following</div>
+      </div>
+      <div class="ig-stat-card blue">
+        <div class="ig-stat-label">Reach (28 days)</div>
+        <div class="ig-stat-value">${fmtNum(reach)}</div>
+        <div class="ig-stat-sub">${nonFollowerPct !== null ? nonFollowerPct + '% non-followers' : 'insights loading...'}</div>
+      </div>
+      <div class="ig-stat-card accent">
+        <div class="ig-stat-label">Impressions (28 days)</div>
+        <div class="ig-stat-value">${fmtNum(impressions)}</div>
+        <div class="ig-stat-sub">${reach ? (impressions/reach).toFixed(1) + 'x frequency' : '—'}</div>
+      </div>
+      <div class="ig-stat-card green">
+        <div class="ig-stat-label">Accounts Engaged (28 days)</div>
+        <div class="ig-stat-value">${fmtNum(engaged)}</div>
+        <div class="ig-stat-sub">${profile.followers_count && engaged ? ((engaged/profile.followers_count)*100).toFixed(1) + '% engagement rate' : '—'}</div>
+      </div>
+    </div>
+
+    <h2 class="ig-section-title">Top Performing Posts</h2>
+    ${topPosts.length ? `<div class="ig-posts-grid">
+      ${topPosts.map(p => `
+        <a href="${p.permalink}" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;">
+          <div class="ig-post-card">
+            <img class="ig-post-img" src="${p.media_type === 'VIDEO' ? (p.thumbnail_url || '') : (p.media_url || '')}" alt="" onerror="this.style.display='none'">
+            <div class="ig-post-body">
+              <div class="ig-post-caption">${(p.caption||'No caption').substring(0,120)}</div>
+              <div class="ig-post-metrics">
+                <div class="ig-post-metric"><span>${fmtNum(p.like_count)}</span> likes</div>
+                <div class="ig-post-metric"><span>${fmtNum(p.comments_count)}</span> comments</div>
+                <div class="ig-post-metric">${new Date(p.timestamp).toLocaleDateString('en-US', {month:'short',day:'numeric'})}</div>
+              </div>
+            </div>
+          </div>
+        </a>
+      `).join('')}
+    </div>` : '<p style="color:var(--ink-muted)">No posts found.</p>'}
+
+    <h2 class="ig-section-title">Audience Breakdown</h2>
+    <div class="ig-audience-grid">
+      <div class="ig-audience-card">
+        <h4>Top Cities</h4>
+        ${cities.length ? renderBarChart(cities) : '<p style="color:var(--ink-muted);font-size:12px;">Audience data requires <code>instagram_manage_insights</code> permission.</p>'}
+      </div>
+      <div class="ig-audience-card">
+        <h4>Top Countries</h4>
+        ${countries.length ? renderBarChart(countries) : '<p style="color:var(--ink-muted);font-size:12px;">Audience data requires <code>instagram_manage_insights</code> permission.</p>'}
+      </div>
+      <div class="ig-audience-card">
+        <h4>Age & Gender</h4>
+        ${genderAge.length ? renderBarChart(genderAge) : '<p style="color:var(--ink-muted);font-size:12px;">Audience data requires <code>instagram_manage_insights</code> permission.</p>'}
+      </div>
+      <div class="ig-audience-card">
+        <h4>Account Summary</h4>
+        <div style="font-size:13px;line-height:2;">
+          <div><strong>Username:</strong> @${profile.username || '—'}</div>
+          <div><strong>Name:</strong> ${profile.name || '—'}</div>
+          <div><strong>Posts:</strong> ${fmtNum(profile.media_count)}</div>
+          <div><strong>Followers:</strong> ${fmtNum(profile.followers_count)}</div>
+          <div><strong>Following:</strong> ${fmtNum(profile.follows_count)}</div>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="ig-section-title">Active Brand Deals</h2>
+    ${activeDeals.length ? `
+      <div style="margin-bottom:12px;font-size:13px;color:var(--ink-muted);">
+        ${activeDeals.length} active deal${activeDeals.length===1?'':'s'} · <span style="color:var(--green);font-weight:600;">$${totalPipeline.toLocaleString()}</span> pipeline value
+      </div>
+      <div class="ig-deals-grid">
+        ${activeDeals.slice(0,6).map(d => `
+          <div class="ig-deal-card">
+            <div class="ig-deal-icon" style="background:${(statusColors[d.status]||'var(--ink-muted)') + '20'};color:${statusColors[d.status]||'var(--ink-muted)'};">
+              ${d.type==='paid'?'$':d.type==='gifted'?'🎁':d.type==='affiliate'?'🔗':'📸'}
+            </div>
+            <div class="ig-deal-info">
+              <div class="ig-deal-brand">${d.brand}</div>
+              <div class="ig-deal-meta">${statusBadge(d.status)} · ${d.deliverables || d.type}</div>
+            </div>
+            ${d.amountAgreed || d.amountQuoted ? `<div class="ig-deal-amount">$${parseFloat(d.amountAgreed || d.amountQuoted).toLocaleString()}</div>` : ''}
+          </div>
+        `).join('')}
+      </div>
+    ` : '<p style="color:var(--ink-muted);">No active deals. Add brands in the CRM tab!</p>'}
+
+    <h2 class="ig-section-title">Content Pipeline</h2>
+    ${pipelineDeals.length ? `
+      <div class="ig-pipeline-list">
+        ${pipelineDeals.map(d => `
+          <div class="ig-pipeline-item">
+            <div class="ig-pipeline-dot" style="background:${statusColors[d.status]||'var(--ink-muted)'}"></div>
+            <div class="ig-pipeline-info">
+              <div class="ig-pipeline-brand">${d.brand}</div>
+              <div class="ig-pipeline-meta">${d.deliverables || '—'} · ${d.status}</div>
+            </div>
+            <div class="ig-pipeline-date">${d.dueDate ? 'Due ' + fmtDate(d.dueDate) : 'No due date'}</div>
+          </div>
+        `).join('')}
+      </div>
+    ` : '<p style="color:var(--ink-muted);">No content in pipeline right now.</p>'}
+  `;
+}
+
+function renderBarChart(data) {
+  const maxVal = Math.max(...data.map(d => d.value));
+  const total = data.reduce((s, d) => s + d.value, 0);
+  return data.map(d => {
+    const pct = total > 0 ? ((d.value / total) * 100).toFixed(1) : 0;
+    const width = maxVal > 0 ? ((d.value / maxVal) * 100) : 0;
+    return `<div class="ig-bar-row">
+      <div class="ig-bar-label">${d.label}</div>
+      <div class="ig-bar-track"><div class="ig-bar-fill" style="width:${width}%"></div></div>
+      <div class="ig-bar-pct">${pct}%</div>
+    </div>`;
+  }).join('');
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
